@@ -5,15 +5,14 @@ module Sidekiq
         def call worker, job, queue
           result = yield
 
-          conn = Bunny.new ENV["RABBITMQ_URL"]
-          conn.start
+          conn = Bunny.new
 
-          mid = job["_holla_id"]
+          puuid = job["_holla_id"]
 
           ch = conn.create_channel
           ex = ch.queue "holla", durable: true
 
-          ex.publish result.to_json, message_id: mid
+          ex.publish result.to_json, headers: { holla: { pipeline: puuid } }
 
           conn.close
         end
