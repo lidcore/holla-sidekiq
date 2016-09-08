@@ -6,6 +6,7 @@ module Sidekiq
           result = yield
 
           conn = Bunny.new
+          conn.start
 
           puuid = job["_holla_id"]
 
